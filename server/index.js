@@ -13,7 +13,7 @@ server.get('/:user/logs', (request, response) => {
   exec(`mkdir -p logs;
         ls logs`, (err, stdout, stderr) => {
     if (err) {
-      console.log(`error: ${err}`);
+      console.log(`err: ${err}`);
       response.status(404).send(err);
       return;
     }
@@ -47,18 +47,18 @@ server.get('/:user/runLatestTest', (request, response) => {
         ls`, (err1, stdout1, stderr1) => {
           if (err1) {
             console.log('err1:', err1);
-            response.status(500).send(error);
+            response.status(500).send(err1);
             return;
           }
           files = stdout1.split('\n');
+          // console.log('files:', files);
           logName = files[1];
           // console.log(logName);
           exec(`cp tests/test${timeStamp}/${logName} logs;
-                cd logs;
-                ls`, (err2, stdout2, stderr2) => {
+                ls logs`, (err2, stdout2, stderr2) => {
             if (err2) {
               console.log('err2:', err2);
-              response.status(400).send(error);
+              response.status(400).send(err2);
               return;
             }
             const logs = stdout2.split('\n');
@@ -68,3 +68,15 @@ server.get('/:user/runLatestTest', (request, response) => {
         });
 });
 
+server.get('/:user/:logName', (request, response) => {
+  exec(`cat logs/${request.params.  logName}`, (err, stdout, stderr) => {
+    if (err) {
+      console.log('err:', err);
+      response.status(400).send(err);
+      return;
+    }
+    const log = stdout;
+    console.log(log);
+    response.status(200).send(log);
+  });
+});
