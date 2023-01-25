@@ -1,2 +1,5 @@
 node_modules
 react-client/dist/bundle.js
+git
+logs
+tests
