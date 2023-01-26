@@ -1,14 +1,18 @@
-const express = require('express');
-const server = express();
-server.use(express.static(`${__dirname}/../client/dist`))
+// Global entry point into the Node.js server
 
+// Import for server and bash commands
+const express = require('express');
+const { exec } = require('child_process');
+
+// Set up a local host express server
+const server = express();
 const PORT = 8001;
+server.use(express.static(`${__dirname}/../client/dist`))
 server.listen(PORT, () => {
   console.log(`Server is live on port ${PORT}.`)
 });
 
-const { exec } = require('child_process');
-
+// Endpoint for page load will fetch the list of logs the current user previously ran
 server.get('/:user/logs', (request, response) => {
   exec(`mkdir -p logs;
         ls logs`, (err, stdout, stderr) => {
@@ -17,47 +21,35 @@ server.get('/:user/logs', (request, response) => {
       response.status(404).send(err);
       return;
     }
-    // console.log(`stdout: ${stdout}`);
-    // console.log(`stderr: ${stderr}`);
-    // console.log(request.params.user);
-
     const logs = stdout.split('\n');
     logs.pop()
-    // console.log('initial log list:', logs);
     response.status(200).send(logs);
   });
 });
 
-server.get('/:user/runLatestTest', (request, response) => {
-  let currentDate = new Date();
-  let timeStamp = '_' + currentDate.getMonth() + 1
-                        + '-' + currentDate.getDate()
-                        + '-' + currentDate.getFullYear()
-                        + "_"
-                        + currentDate.getHours() + ":"
-                        + currentDate.getMinutes() + ":"
-                        + currentDate.getSeconds();
-  // console.log(`test${timeStamp}`);
-  exec(`mkdir -p tests;
-        cd tests;
-        git clone https://github.com/${request.params.user}/test.git;
-        mv test test${timeStamp};
-        cd test${timeStamp};
+// Endpoint for running the latest test version from GitHub
+server.post('/:user/runLatestTest', (request, response) => {
+  // Remove previous repo version, clone repo, run test, list repo files
+  exec(`mkdir -p repositories;
+        cd repositories;
+        rm -rf sampleTestApp
+        git clone https://github.com/${request.params.user}/sampleTestApp.git;
+        cd sampleTestApp;
         python3 test.py;
-        ls`, (err1, stdout1, stderr1) => {
+        ls`, (err1, repoFiles, stderr1) => {
           if (err1) {
-            console.log('err1:', err1);
+            console.log('runTest err1:', err1);
             response.status(500).send(err1);
             return;
           }
-          files = stdout1.split('\n');
-          // console.log('files:', files);
-          logName = files[1];
-          // console.log(logName);
-          exec(`cp tests/test${timeStamp}/${logName} logs;
+          files = repoFiles.split('\n');
+          logName = files[0];
+
+          // Copy log file from repo to logs folder, send updated log list to client
+          exec(`cp repositories/sampleTestApp/${logName} logs;
                 ls logs`, (err2, stdout2, stderr2) => {
             if (err2) {
-              console.log('err2:', err2);
+              console.log('runTest err2:', err2);
               response.status(400).send(err2);
               return;
             }
@@ -68,15 +60,15 @@ server.get('/:user/runLatestTest', (request, response) => {
         });
 });
 
+// Endpoint for fetching the contents of a specific log file
 server.get('/:user/:logName', (request, response) => {
-  exec(`cat logs/${request.params.  logName}`, (err, stdout, stderr) => {
+  exec(`cat logs/${request.params.logName}`, (err, stdout, stderr) => {
     if (err) {
-      console.log('err:', err);
+      console.log('logName err:', err);
       response.status(400).send(err);
       return;
     }
     const log = stdout;
-    console.log(log);
     response.status(200).send(log);
   });
 });

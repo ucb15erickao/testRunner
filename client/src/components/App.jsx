@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
-import styles from './styles.css'
+import styles from './styles.css';
+import LogList from './LogList';
+import LogFile from './LogFile';
 
 class App extends React.Component {
   constructor(props) {
@@ -16,6 +18,7 @@ class App extends React.Component {
     this.returnToMain = this.returnToMain.bind(this);
   }
 
+  // Initial page load fetches list of logs
   componentDidMount() {
     axios.get(`/${this.state.user}/logs`)
       .then((response) => {
@@ -28,10 +31,11 @@ class App extends React.Component {
       });
   };
 
+  // Download and run the latest test version, then receive an updated list of logs
   runTest() {
-    axios.get(`/${this.state.user}/runLatestTest`)
+    axios.post(`/${this.state.user}/runLatestTest`)
       .then((response) => {
-        console.log('response received')
+        console.log('latest test has been run')
         console.log(response.data)
         this.setState({logs: response.data});
       })
@@ -40,10 +44,12 @@ class App extends React.Component {
       });
   };
 
+  // Display the contents of a specific log file on a separate page
   displayLog(logName) {
     console.log('logName in displayLog:', logName);
     axios.get(`/${this.state.user}/${logName}`)
       .then((response) => {
+        console.log('response.data:', response.data);
         this.setState({
           page: logName,
           log: response.data
@@ -54,16 +60,18 @@ class App extends React.Component {
       });
   };
 
+  // Returns to main testing page from the single log display
   returnToMain() {
     this.setState({ page: 'main' });
   };
 
   render() {
+    console.log('this.state.page:', this.state.page);
     if (this.state.page === 'main') {
       return (
         <div className={styles.container}>
           <div className={styles.sectionTitle}>
-            Sample Testing Page
+            Test Runner
           </div>
           <button className={styles.customButton}
                   onClick={() => { this.runTest(); }}>
@@ -72,30 +80,12 @@ class App extends React.Component {
           <div className={styles.sectionTitle}>
             Previous Test Logs
           </div>
-          <div>
-            {this.state.logs.map((log, i) => {
-              return (
-                <div className={styles.logList}
-                     onClick={() => { this.displayLog(log); }}>
-                  {log}
-                </div>
-              );
-            })}
-          </div>
+          <LogList list={this.state.logs} displayLog={this.displayLog} />
         </div>
       )
     } else {
       return (
-        <div>
-          <button className={styles.customButton}
-                  onClick={() => { this.returnToMain(); }}>
-            Return to Testing Page
-          </button>
-          <div className={styles.log}>
-            {this.state.log}
-          </div>
-
-        </div>
+        <LogFile log={this.state.log} returnToMain={this.returnToMain} />
       )
     }
 
