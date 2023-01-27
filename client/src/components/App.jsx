@@ -1,3 +1,5 @@
+// React application containing all functionality
+
 import React from 'react';
 import axios from 'axios';
 import styles from './styles.css';
@@ -9,7 +11,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       page: 'main',
-      user: 'ucb15erickao',
+      repository: 'sampleTestApp',
       logs: [],
       log: ''
     };
@@ -20,7 +22,7 @@ class App extends React.Component {
 
   // Initial page load fetches list of logs
   componentDidMount() {
-    axios.get(`/${this.state.user}/logs`)
+    axios.get(`/${this.state.repository}/logs`)
       .then((response) => {
         console.log('response received')
         console.log(response.data)
@@ -33,7 +35,7 @@ class App extends React.Component {
 
   // Download and run the latest test version, then receive an updated list of logs
   runTest() {
-    axios.post(`/${this.state.user}/runLatestTest`)
+    axios.post(`/${this.state.repository}/runLatestTest`)
       .then((response) => {
         console.log('latest test has been run')
         console.log(response.data)
@@ -47,7 +49,7 @@ class App extends React.Component {
   // Display the contents of a specific log file on a separate page
   displayLog(logName) {
     console.log('logName in displayLog:', logName);
-    axios.get(`/${this.state.user}/${logName}`)
+    axios.get(`/${this.state.repository}/${logName}`)
       .then((response) => {
         console.log('response.data:', response.data);
         this.setState({
@@ -66,12 +68,11 @@ class App extends React.Component {
   };
 
   render() {
-    console.log('this.state.page:', this.state.page);
     if (this.state.page === 'main') {
       return (
         <div className={styles.container}>
           <div className={styles.sectionTitle}>
-            Test Runner
+            Main Testing Page
           </div>
           <button className={styles.customButton}
                   onClick={() => { this.runTest(); }}>
@@ -85,7 +86,11 @@ class App extends React.Component {
       )
     } else {
       return (
-        <LogFile log={this.state.log} returnToMain={this.returnToMain} />
+        <LogFile
+          log={this.state.log}
+          logName={this.state.page}
+          returnToMain={this.returnToMain}
+        />
       )
     }
 

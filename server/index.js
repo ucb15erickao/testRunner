@@ -13,7 +13,7 @@ server.listen(PORT, () => {
 });
 
 // Endpoint for page load will fetch the list of logs the current user previously ran
-server.get('/:user/logs', (request, response) => {
+server.get('/:repository/logs', (request, response) => {
   exec(`mkdir -p logs;
         ls logs`, (err, stdout, stderr) => {
     if (err) {
@@ -22,18 +22,19 @@ server.get('/:user/logs', (request, response) => {
       return;
     }
     const logs = stdout.split('\n');
-    logs.pop()
+    logs.pop();
+    logs.reverse();
     response.status(200).send(logs);
   });
 });
 
 // Endpoint for running the latest test version from GitHub
-server.post('/:user/runLatestTest', (request, response) => {
+server.post('/:repository/runLatestTest', (request, response) => {
   // Remove previous repo version, clone repo, run test, list repo files
   exec(`mkdir -p repositories;
         cd repositories;
         rm -rf sampleTestApp
-        git clone https://github.com/${request.params.user}/sampleTestApp.git;
+        git clone https://github.com/ucb15erickao/${request.params.repository}.git;
         cd sampleTestApp;
         python3 test.py;
         ls`, (err1, repoFiles, stderr1) => {
@@ -54,14 +55,15 @@ server.post('/:user/runLatestTest', (request, response) => {
               return;
             }
             const logs = stdout2.split('\n');
-            logs.pop()
+            logs.pop();
+            logs.reverse();
             response.status(200).send(logs);
           })
         });
 });
 
 // Endpoint for fetching the contents of a specific log file
-server.get('/:user/:logName', (request, response) => {
+server.get('/:repository/:logName', (request, response) => {
   exec(`cat logs/${request.params.logName}`, (err, stdout, stderr) => {
     if (err) {
       console.log('logName err:', err);
