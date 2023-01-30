@@ -24,8 +24,7 @@ class App extends React.Component {
   componentDidMount() {
     axios.get(`/${this.state.repository}/logs`)
       .then((response) => {
-        console.log('response received')
-        console.log(response.data)
+        // console.log('response received')
         this.setState({logs: response.data});
       })
       .catch((error) => {
@@ -37,8 +36,7 @@ class App extends React.Component {
   runTest() {
     axios.post(`/${this.state.repository}/runLatestTest`)
       .then((response) => {
-        console.log('latest test has been run')
-        console.log(response.data)
+        // console.log('latest test has been run')
         this.setState({logs: response.data});
       })
       .catch((error) => {
@@ -48,10 +46,8 @@ class App extends React.Component {
 
   // Display the contents of a specific log file on a separate page
   displayLog(logName) {
-    console.log('logName in displayLog:', logName);
     axios.get(`/${this.state.repository}/${logName}`)
       .then((response) => {
-        console.log('response.data:', response.data);
         this.setState({
           page: logName,
           log: response.data
@@ -71,6 +67,9 @@ class App extends React.Component {
     if (this.state.page === 'main') {
       return (
         <div className={styles.container}>
+          <div className={styles.titleBar}>
+            Test Runner
+          </div>
           <div className={styles.sectionTitle}>
             Main Testing Page
           </div>
@@ -81,7 +80,10 @@ class App extends React.Component {
           <div className={styles.sectionTitle}>
             Previous Test Logs
           </div>
-          <LogList list={this.state.logs} displayLog={this.displayLog} />
+          <LogList
+            list={this.state.logs}
+            displayLog={this.displayLog}
+          />
         </div>
       )
     } else {

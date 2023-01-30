@@ -3,6 +3,7 @@
 // Import for server and bash commands
 const express = require('express');
 const { exec } = require('child_process');
+// const fs = require('fs');
 
 // Set up a local host express server
 const server = express();
@@ -33,10 +34,10 @@ server.post('/:repository/runLatestTest', (request, response) => {
   // Remove previous repo version, clone repo, run test, list repo files
   exec(`mkdir -p repositories;
         cd repositories;
-        rm -rf sampleTestApp
+        rm -rf ${request.params.repository}
         git clone https://github.com/ucb15erickao/${request.params.repository}.git;
-        cd sampleTestApp;
-        python3 test.py;
+        cd ${request.params.repository};
+        python3 testFile.py;
         ls`, (err1, repoFiles, stderr1) => {
           if (err1) {
             console.log('runTest err1:', err1);
@@ -64,6 +65,17 @@ server.post('/:repository/runLatestTest', (request, response) => {
 
 // Endpoint for fetching the contents of a specific log file
 server.get('/:repository/:logName', (request, response) => {
+  /*
+  const buffer = fs.readFileSync(`logs/${request.params.logName}`);
+  const logContents = buffer.toString();
+  console.log('logContents:', logContents);
+  if (!buffer || !logContents) {
+    console.log('logName err:', err);
+    response.status(400).send(err);
+    return;
+  }
+  response.status(200).send(logContents);
+  */
   exec(`cat logs/${request.params.logName}`, (err, stdout, stderr) => {
     if (err) {
       console.log('logName err:', err);

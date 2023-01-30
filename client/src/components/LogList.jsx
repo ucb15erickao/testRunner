@@ -7,9 +7,13 @@ const LogList = ({ list, displayLog }) => (
   <div>
     {list.map((log, i) => {
       return (
-        <div className={styles.logList}
-          onClick={() => { displayLog(log); }}>
-          {log}
+        <div className={styles.listRow}>
+          <span
+            className={styles.logList}
+            onClick={() => { displayLog(log); }
+          }>
+            {`${log} `}
+          </span>
         </div>
       );
     })}

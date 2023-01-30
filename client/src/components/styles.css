@@ -1,17 +1,32 @@
 .container {
   border: 1;
+  border-color: #2c2c2c;
+  border-style: solid;
   box-sizing: border-box;
   position: relative;
   display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 2px;
+  left: 0px;
+  width: 80%;
   min-width: 259.5px;
   background-color: #FFF;
   color: #2c2c2c;
-  padding: 1.125rem;
+  padding: 1.5rem;
   font-family: 'Helvetica Neue';
-  margin: 2rem;
+  margin: 0 auto;
+}
+
+.titleBar {
+  position: relative;
+  /* margin: auto;
+  width: 700px; */
+  padding: 18px 0 5px 8px;
+  border-bottom: 1px solid black;
+  letter-spacing: 1px;
+  font-family: Consolas, monaco, monospace;
+  font-size: 32px;
+  font-weight: 700;
+  border-bottom: 1px solid black;
 }
 
 .sectionTitle {
@@ -21,23 +36,43 @@
 }
 
 .customButton {
-  font-size: 15;
-  margin: 1rem;
+  font-size: 18;
+  font-family: Consolas, monaco, monospace;
+  margin: 1rem 0;
   cursor: pointer;
+  background-color: #d1d1e0;
+  border: 2px solid #d1d1e0;
+  border-radius: 4px;
+  padding: 0.88rem;
+}
+
+.customButton:active {
+  box-shadow: 0 0 12px #006db7;
+}
+
+.customButton:hover {
+  background-color: #FFF;
+}
+
+.listRow {
+  margin: 1rem 0;
 }
 
 .logList {
   font-size: 15;
-  margin: 1rem;
   color: #006DB7;
   cursor: pointer;
+  white-space: pre;
 }
 
 .logList:hover {
   text-decoration: underline;
+  color: royalblue;
 }
 
 .log {
-  margin: 1rem;
+  margin: 1rem 0;
+  font-family: 'Courier New';
   font-size: 14;
+  white-space: pre;
 }
